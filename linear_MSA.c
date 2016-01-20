@@ -24,17 +24,17 @@ int linearSubArray(int a[], int n){
 	int max_ending_here = a[0];
 
 	for(i = 1; i < n; i++) {
-        if(a[i] > (max_ending_here + a[i])){
-            max_ending_here = a[i];
-            begin = i;
-        } else {
-            max_ending_here = max_ending_here + a[i];
-        }
-
-        if(max_so_far < max_ending_here) {
-            max_so_far = max_ending_here;
-            end = i;
-        }
+	        if(a[i] > (max_ending_here + a[i])){
+	            max_ending_here = a[i];
+	            begin = i;
+	        } else {
+	            max_ending_here = max_ending_here + a[i];
+	        }
+	
+	        if(max_so_far < max_ending_here) {
+	            max_so_far = max_ending_here;
+	            end = i;
+	        }
 	}
 	return max_so_far;
 }
