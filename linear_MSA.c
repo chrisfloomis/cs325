@@ -13,21 +13,29 @@ seen so far. Knowing a maximum subarray of A[1 . . j], extend the answer to find
 ending at index j+1 by using the following observation: a maximum subarray of A[1 . . j+1] is either a
 maximum subarray of A[1 . . j] or a subarray A[i . . j+1], for some 1 ≤ i ≤ j+1. Determine a maximum
 subarray of the form A[i . . j+1] in constant time based on knowing a maximum subarray ending at
-index j. 
+index j.
 */
-
 #include <stdio.h>
-
+#include <stdlib.h>
 int linearSubArray(int a[], int n){
+	int i;
+	int begin = 0, end = 0;
+	int max_so_far = a[0];
+	int max_ending_here = a[0];
 
-	int i, j; 
-	int max_so_far = a[0];  
-	int max_ending_here = a[0]; 
+	for(i = 1; i < n; i++) {
+        if(a[i] > (max_ending_here + a[i])){
+            max_ending_here = a[i];
+            begin = i;
+        } else {
+            max_ending_here = max_ending_here + a[i];
+        }
 
-	for(int i = 1; i < n; i++) {
-		max_ending_here = max(a[i], max_ending_here + a[i]); 
-		max_so_far = max(max_so_far, max_ending_here);
+        if(max_so_far < max_ending_here) {
+            max_so_far = max_ending_here;
+            end = i;
+        }
 	}
-
-	return max_so_far
+	return max_so_far;
 }
+
