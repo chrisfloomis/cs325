@@ -27,12 +27,10 @@ void printArray(FILE *file, int a[], int size, int begin, int end, int maxSum) {
         if(i < end)
 		{
             fprintf(file, "%d, ", a[i]);
-			printf("value is %d\n", a[i]);
 		}
         else
 		{
             fprintf(file, "%d]", a[i]);
-					printf("value is %d\n", a[i]);
 		}
 
     }
@@ -333,16 +331,16 @@ int main(int argc, char *argv[]) {
     array3 = buildArray(40, file, &length[2]);
     array4 = buildArray(40, file, &length[3]);
     array5 = buildArray(40, file, &length[4]);
-     // array6 = buildArray(40, file, &length[5]);
-     // array7 = buildArray(40, file, &length[6]);
+    array6 = buildArray(40, file, &length[5]);
+    array7 = buildArray(40, file, &length[6]);
 
 	linearSubArray(array1, length[0], output);
 	linearSubArray(array2, length[1], output);
 	linearSubArray(array3, length[2], output);
 	linearSubArray(array4, length[3], output);
 	linearSubArray(array5, length[4], output);
-	 // linearSubArray(array6, length[5], output);
-	 // linearSubArray(array7, length[6], output);
+	linearSubArray(array6, length[5], output);
+	linearSubArray(array7, length[6], output);
 
 	//betterEnumMaxSubarray(array1, length[0], output);
 
@@ -352,8 +350,8 @@ int main(int argc, char *argv[]) {
     free(array3);
     free(array4);
     free(array5);
-     // free(array6);
-     // free(array7);
+    free(array6);
+    free(array7);
 
     fclose(file);
     fclose(output);
