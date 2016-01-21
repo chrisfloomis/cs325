@@ -1,5 +1,6 @@
 /*
 Authors:        Benjamin Tullis, Dalena Pham, Chris Loomis
+Group:			9
 Filename:       divConq_MSA.c
 Created On:     01/18/2016
 Last Mod:       01/18/2016
@@ -16,6 +17,7 @@ subarray will either be
 The first two cases can be found recursively. The last case can be found in linear time
 */
 
+#include "msa.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h> //fmax

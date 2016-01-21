@@ -1,8 +1,9 @@
 /*
 Authors:        Benjamin Tullis, Dalena Pham, Chris Loomis
+Group:			9
 Filename:       linear_MSA.c
 Created On:     01/18/2016
-Last Mod:       01/18/2016
+Last Mod:       01/20/2016
 
 Adapted from https://en.wikipedia.org/wiki/Maximum_subarray_problem
 
@@ -15,9 +16,10 @@ maximum subarray of A[1 . . j] or a subarray A[i . . j+1], for some 1 ≤ i ≤ 
 subarray of the form A[i . . j+1] in constant time based on knowing a maximum subarray ending at
 index j.
 */
+#include "msa.h"
 #include <stdio.h>
 #include <stdlib.h>
-int linearSubArray(int a[], int n){
+int linearSubArray(int a[], int n, int *msa, int *msaSum){
 	int i;
 	int begin = 0, end = 0;
 	int max_so_far = a[0];
@@ -36,6 +38,19 @@ int linearSubArray(int a[], int n){
 	            end = i;
 	        }
 	}
-	return max_so_far;
+
+	*msaSum = max_so_far;
+	
+	int len = (end-begin)+1;
+	int result[len];
+	
+	for(i = 0; i < len; i++){
+		result[i] = a[begin];
+		begin++;
+	}
+	
+	msa = result;
+	
+	return 0;
 }
 

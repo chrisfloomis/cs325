@@ -1,5 +1,6 @@
 /*
 Authors:        Benjamin Tullis, Dalena Pham, Chris Loomis
+Group:			9
 Filename:       betterEnum_MSA.c
 Created On:     01/18/2016
 Last Mod:       01/18/2016
@@ -17,6 +18,7 @@ of the first algorithm that takes advantage
 of this observation
 */
 
+#include "msa.h"
 #include <stdio.h>
 
 int betterEnumMaxSubarray(int a[], int n){

@@ -1,5 +1,6 @@
 /*
 Authors:        Benjamin Tullis, Dalena Pham, Chris Loomis
+Group:			9
 Filename:       enum_MSA.c
 Created On:     01/18/2016
 Last Mod:       01/18/2016
@@ -13,6 +14,7 @@ Sigma(f)(k=i) a[k]
 Keep the best sum you have found so far
 */
 
+#include "msa.h"
 #include <stdio.h>
 
 /*

@@ -1,3 +1,12 @@
+/*
+Authors:        Benjamin Tullis, Dalena Pham, Chris Loomis
+Group:			9
+Filename:       main.c
+Created On:     01/20/2016
+Last Mod:       01/20/2016
+*/
+
+#include "msa.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,7 +69,7 @@ int* buildArray(int size, FILE *file, int* length) {
 
 
 /* Modified linearSubArray method that will output the array assessed, the maximum
-    subarray and the maximum sum */
+    subarray and the maximum sum 
 int linearSubArray(int a[], int n, FILE *file){
 	int i;
 	int begin = 0, end = 0;
@@ -84,16 +93,20 @@ int linearSubArray(int a[], int n, FILE *file){
 	printArray(file, a, n, begin, end, max_so_far);
 
 	return max_so_far;
-}
-
+}*/
 
 int main(int argc, char *argv[]) {
+printf("1");
+	int i;		//counter
+	int *msa = NULL;	//this pointer will get the array back from functions
+	int msaSum;		//this will hold the sum
+	
     FILE *file, *output;
     file = fopen(argv[1], "r");
     output = fopen("MSS_Results.txt", "w");
     int* array1, *array2, *array3, *array4, *array5, *array6, *array7;
     int length[7];
-
+printf("2");
     array1 = buildArray(40, file, &length[0]);
     array2 = buildArray(40, file, &length[1]);
     array3 = buildArray(40, file, &length[2]);
@@ -101,10 +114,16 @@ int main(int argc, char *argv[]) {
     array5 = buildArray(40, file, &length[4]);
     array6 = buildArray(40, file, &length[5]);
     array7 = buildArray(40, file, &length[6]);
-
-    linearSubArray(array1, length[0], output);
-
-
+printf("3");
+    linearSubArray(array1, length[0], msa, &msaSum);		//pass in array, length, pointer for subarr, and pointer to store the sum of subarr
+printf("4");	
+	printf("msa\n");
+printf("5");								/* SEG FAULT HERE
+	for(i=0; i<length[0]; i++){	//guessing problem is here, for loop going out of bounds
+		printf("%d \n", msa[i]);	//wanted it to print value to console for checking if it was doing it's job
+	}
+	printf("msaSum is %d \n", msaSum);*/
+printf("6");
     free(array1);
     free(array2);
     free(array3);
@@ -115,5 +134,7 @@ int main(int argc, char *argv[]) {
 
     fclose(file);
     fclose(output);
+	
+	return 0;
 }
 
