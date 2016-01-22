@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <math.h> //fmax
 
-
 /* Prints array in format:
     Entire array
     Maximum subarray
@@ -67,8 +66,7 @@ int* buildArray(int size, FILE *file, int* length) {
     return array;
 }
 
-
-/* 
+/*
 Authors:        Benjamin Tullis, Dalena Pham, Chris Loomis
 Filename:       linear_MSA.c
 Created On:     01/18/2016
@@ -79,7 +77,7 @@ Adapted from https://en.wikipedia.org/wiki/Maximum_subarray_problem
 ***ALGORITHM 4: Linear Time
 Modified linearSubArray method that will output the array assessed, the maximum
 subarray and the maximum sum
-	
+
 Use the following ideas to develop a nonrecursive linear time algorithm. Start
 at the left end of the array and progress towards the right, keeping track of the maximum subarray sum
 seen so far. Knowing a maximum subarray of A[1 . . j], extend the answer to find a maximum subarray
@@ -89,7 +87,7 @@ subarray of the form A[i . . j+1] in constant time based on knowing a maximum su
 index j.
 */
 
-int linearSubArray(int a[], int n, FILE *file){
+void linearSubArray(int a[], int n, FILE *file){
 	int i;
 	int begin = 0, end = 0, begin_temp = 0;
 	int max_so_far = a[0];
@@ -97,7 +95,6 @@ int linearSubArray(int a[], int n, FILE *file){
 
 	for(i = 1; i < n; i++) {
 		   if(a[i] > (max_ending_here + a[i])){
-			   printf("%d", a[i]);
 			   max_ending_here = a[i];
 			   begin_temp = i;
 		   } else {
@@ -114,8 +111,6 @@ int linearSubArray(int a[], int n, FILE *file){
 	}
 
 	printArray(file, a, n, begin, end, max_so_far);
-
-return max_so_far;
 }
 
 /*
@@ -137,74 +132,74 @@ subarray will either be
 The first two cases can be found recursively. The last case can be found in linear time
 */
 
+/* Struct to keep track of maximum sum and maximum subarray in algorithm 3 */
+struct Tracker {
+    int lo;
+    int hi;
+    int sum;
+};
 
-int divAndConMaxSubarray(int a[], int lo, int hi)
-{
-	//int* sumArray = malloc((hi - lo) * sizeof(int)); //for storing winning array, 
-		//maybe don't need
-	
-	//midpoint of array
-	int midpoint;
-	
-	//max's found w/ div and conq
-	int leftMax=0;
-	int rightMax=0;
-
-	//max's found crossing middle iteratively
-	int bothMax=0;
-	int bothMaxLeft=0;
-	int bothMaxRight=0;
-
+struct Tracker divAndConMaxSubarrayHelper(int a[], int lo, int hi) {
 	//counters
 	int i, sum;
+	//midpoint
+	int midpoint = (lo + hi) / 2;
+	//max's found w/ div and conq
+    struct Tracker leftMax;
+    struct Tracker rightMax;
+    struct Tracker tracker;
+    //max's found crossing middle iteratively
+	int bothMax = 0, bothMaxLeft = 0, bothMaxRight =0;
 
 	//base case, only 1 element in array
-	//TODO: ensure no issue w/ no elements
-	if (lo==hi) { //lo and hi are the same element
-		return a[hi]; //sum is this element alone
-	}
+	if (lo==hi){
+        tracker.sum = a[lo];
+        tracker.lo = lo;
+        tracker.hi = hi;
+        return tracker;
+	} else {
+        //maximum sum on left
+        leftMax = divAndConMaxSubarrayHelper(a, lo, midpoint);
+        //max sum on right
+        rightMax = divAndConMaxSubarrayHelper(a, midpoint+1, hi);
 
-	//divide  array into two halves
-	midpoint = (lo + hi)/2;
-
-	//maximum of 
-
-		//maximum sum on left
-		//recursive call
-
-	
-	leftMax = divAndConMaxSubarray(a, lo, midpoint);
-
-		//max sum on right
-		//recursive call
-	
-	rightMax = divAndConMaxSubarray(a, midpoint+1, hi);
-
-		//max sum from midpoint
-			//find max going left
-
-	bothMaxLeft = 0;
-	sum = 0;
-	for (i = midpoint-1; i >=0; i-- ){
-		sum += a[i];
-		if (sum > bothMaxLeft)
-			bothMaxLeft = sum;
-	}
-	
-			//find max going right
-	bothMaxRight = 0;
-	sum = 0;
-	for (i = midpoint; i < hi; i++ ){
-		sum += a[i];
-		if (sum > bothMaxRight)
-			bothMaxRight = sum;
-	}
-			//combine
-	bothMax = bothMaxRight + bothMaxLeft;
-
-	return fmax(bothMax, fmax(leftMax, rightMax));
+        //max sum from midpoint
+        //find max going left
+        sum = 0;
+        for (i = midpoint; i >= lo; i--){
+            sum += a[i];
+            if (sum > bothMaxLeft){
+                bothMaxLeft = sum;
+                tracker.lo = i;
+            }
+        }
+        //find max going right
+        sum = 0;
+        for (i = midpoint + 1; i <= hi; i++){
+            sum += a[i];
+            if (sum > bothMaxRight){
+                bothMaxRight = sum;
+                tracker.hi = i;
+            }
+        }
+        //combine
+        tracker.sum = bothMaxRight + bothMaxLeft;
+        if(leftMax.sum >= rightMax.sum && leftMax.sum >= tracker.sum){
+            return leftMax;
+        } else if(rightMax.sum >= leftMax.sum && rightMax.sum >= tracker.sum) {
+            return rightMax;
+        } else {
+            return tracker;
+        }
+    }
 }
 
+void divAndConMaxSubarray(int a[], int n, FILE *file)
+{
+    struct Tracker tracker;
+    tracker = divAndConMaxSubarrayHelper(a, 0, n-1);
+    printArray(file, a, n, tracker.lo, tracker.hi, tracker.sum);
+}
 
 /*
 Authors:        Benjamin Tullis, Dalena Pham, Chris Loomis
@@ -215,45 +210,35 @@ Last Mod:       01/18/2016
 Code sourced from Samuel Snyder https://github.com/samuelsnyder/max-sum-sub-array/blob/master/a2.c
 
 ***ALGORITHM 2: Better Enumeration
-Notice that in the previous algorithm, 
+Notice that in the previous algorithm,
 the same sum is computed many
-times. In particular, notice that Sigma(j)(k=i)a[k] 
+times. In particular, notice that Sigma(j)(k=i)a[k]
 can be computed from
 Sigma(j-1)(k=1)a[k] in O(1) time, rather than
-starting from scratch. Write a new version 
-of the first algorithm that takes advantage 
+starting from scratch. Write a new version
+of the first algorithm that takes advantage
 of this observation
 */
 
-int betterEnumMaxSubarray(int a[], int n, FILE *file){
-
+void betterEnumMaxSubarray(int a[], int n, FILE *file){
 	//counters
-	int i, j; //1st term, curr term
-	//don't need last term, go to the end every run
-	
-	//variables to store arrays
-	/* array variables here */
-
+	int i, j, begin, end;
 	//sum variables
-	int sum = 0;
-	int best = 0;
+	int sum = 0, best = 0;
 
 	for (i = 0; i < n; i++){
 		sum = 0; //new starting term, new sum
 		for (j = i; j < n; j++){
 			sum += a[j];
 			if (sum > best){
+                begin = i;
+                end = j;
 				best = sum; //new winner
-
-				/*
-				TODO copy array segment here maybe
-				*/
 			}
 		}
 	}
-	printArray(file, a, n, 0, 0, best);
 
-	return best;
+	printArray(file, a, n, begin, end, best);
 }
 
 
@@ -269,53 +254,42 @@ Code sourced from Samuel Snyder https://github.com/samuelsnyder/max-sum-sub-arra
 Find Max Subarray by Enumeration
 Loop over each pair of indices
 i, j and compute the sum,
-Sigma(f)(k=i) a[k] 
+Sigma(f)(k=i) a[k]
 Keep the best sum you have found so far
 */
 
 /*
 Pre: a[] is an array of integers of length n
 Post: a[] is now the max subarray
-Returns: int which represents greatest sum in 
+Returns: int which represents greatest sum in
 	subarray
 */
 
-
-int enumMaxSubarray(int a[], int n){
-	
-
+void enumMaxSubarray(int a[], int n, FILE *file){
 	//counters
-	int i; //pos of first term in subarray 
-	int j; //last term in subarray
-	int k; //current term in subarray
-
-	//int currentArray [n];
-	int currentArrayLength;
-	//int maxArray [n];
-	int maxArrayLength;
-	int sum = 0;
-	int best = 0;
+    int i, j, k, begin, end;
+	int currentArrayLength, maxArrayLength;
+	int sum = 0, best = 0;
 
 	for (i = 0; i < n; i++) //first term
 	{
 		for (j = i; j < n; j++){//last term
-			sum = 0;//
-			//eraseArray(currentArray);
+			sum = 0;
 			currentArrayLength = 0;
 			for(k = i; k <= j; k++) //step thru terms
 			{
 				sum += a[k];
-				//currentArray[(k-i)] = a[k];
 				currentArrayLength++;
 			}
 				if (sum > best){
+                begin = i;
+                end = j;
 				best = sum; //new record
 				maxArrayLength = currentArrayLength;
-				//copyArray(currentrrentArray, maxArray, maxArrayLength);
 			}
-		} 
+		}
 	}
-	return best;
+	printArray(file, a, n, begin, end, best);
 }
 
 
@@ -342,8 +316,29 @@ int main(int argc, char *argv[]) {
 	linearSubArray(array6, length[5], output);
 	linearSubArray(array7, length[6], output);
 
-	//betterEnumMaxSubarray(array1, length[0], output);
+    divAndConMaxSubarray(array1, length[0], output);
+    divAndConMaxSubarray(array2, length[1], output);
+    divAndConMaxSubarray(array3, length[2], output);
+    divAndConMaxSubarray(array4, length[3], output);
+    divAndConMaxSubarray(array5, length[4], output);
+    divAndConMaxSubarray(array6, length[5], output);
+    divAndConMaxSubarray(array7, length[6], output);
 
+	betterEnumMaxSubarray(array1, length[0], output);
+	betterEnumMaxSubarray(array2, length[1], output);
+	betterEnumMaxSubarray(array3, length[2], output);
+	betterEnumMaxSubarray(array4, length[3], output);
+	betterEnumMaxSubarray(array5, length[4], output);
+	betterEnumMaxSubarray(array6, length[5], output);
+	betterEnumMaxSubarray(array7, length[6], output);
+
+	enumMaxSubarray(array1, length[0], output);
+	enumMaxSubarray(array2, length[1], output);
+	enumMaxSubarray(array3, length[2], output);
+	enumMaxSubarray(array4, length[3], output);
+	enumMaxSubarray(array5, length[4], output);
+	enumMaxSubarray(array6, length[5], output);
+	enumMaxSubarray(array7, length[6], output);
 
     free(array1);
     free(array2);
