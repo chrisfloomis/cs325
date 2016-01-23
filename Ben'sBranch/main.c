@@ -1,7 +1,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h> //fmax
+#include <time.h>
+#define TESTSIZE 10     // EXPERIMENTAL ANALYSIS CODE
 
 /* Prints array in format:
     Entire array
@@ -87,12 +88,15 @@ subarray of the form A[i . . j+1] in constant time based on knowing a maximum su
 index j.
 */
 
-void linearSubArray(int a[], int n, FILE *file){
+float linearSubArray(int a[], int n, FILE *file){
 	int i;
 	int begin = 0, end = 0, begin_temp = 0;
 	int max_so_far = a[0];
 	int max_ending_here = a[0];
+	float total_time;
+	clock_t start_time, end_time;
 
+    start_time = clock();
 	for(i = 1; i < n; i++) {
 		   if(a[i] > (max_ending_here + a[i])){
 			   max_ending_here = a[i];
@@ -110,7 +114,10 @@ void linearSubArray(int a[], int n, FILE *file){
 		   }
 	}
 
+    end_time = clock();
+    total_time =(float)end_time - (float)start_time;
 	printArray(file, a, n, begin, end, max_so_far);
+	return total_time;
 }
 
 /*
@@ -149,7 +156,7 @@ struct Tracker divAndConMaxSubarrayHelper(int a[], int lo, int hi) {
     struct Tracker rightMax;
     struct Tracker tracker;
     //max's found crossing middle iteratively
-	int bothMax = 0, bothMaxLeft = 0, bothMaxRight =0;
+	int bothMaxLeft = 0, bothMaxRight =0;
 
 	//base case, only 1 element in array
 	if (lo==hi){
@@ -194,11 +201,19 @@ struct Tracker divAndConMaxSubarrayHelper(int a[], int lo, int hi) {
     }
 }
 
-void divAndConMaxSubarray(int a[], int n, FILE *file)
+float divAndConMaxSubarray(int a[], int n, FILE *file)
 {
+    float total_time;
+    clock_t start_time, end_time;
     struct Tracker tracker;
+
+    start_time = clock();
     tracker = divAndConMaxSubarrayHelper(a, 0, n-1);
+    end_time = clock();
+    total_time =(float)end_time - (float)start_time;
     printArray(file, a, n, tracker.lo, tracker.hi, tracker.sum);
+
+    return total_time;
 }
 
 /*
@@ -220,12 +235,15 @@ of the first algorithm that takes advantage
 of this observation
 */
 
-void betterEnumMaxSubarray(int a[], int n, FILE *file){
+float betterEnumMaxSubarray(int a[], int n, FILE *file){
 	//counters
 	int i, j, begin, end;
 	//sum variables
 	int sum = 0, best = 0;
+    float total_time;
+    clock_t start_time, end_time;
 
+	start_time = clock();
 	for (i = 0; i < n; i++){
 		sum = 0; //new starting term, new sum
 		for (j = i; j < n; j++){
@@ -237,8 +255,11 @@ void betterEnumMaxSubarray(int a[], int n, FILE *file){
 			}
 		}
 	}
-
+	end_time = clock();
+    total_time =(float)end_time - (float)start_time;
 	printArray(file, a, n, begin, end, best);
+
+	return total_time;
 }
 
 
@@ -265,12 +286,15 @@ Returns: int which represents greatest sum in
 	subarray
 */
 
-void enumMaxSubarray(int a[], int n, FILE *file){
+float enumMaxSubarray(int a[], int n, FILE *file){
 	//counters
     int i, j, k, begin, end;
 	int currentArrayLength, maxArrayLength;
 	int sum = 0, best = 0;
+    float total_time;
+    clock_t start_time, end_time;
 
+    start_time = clock();
 	for (i = 0; i < n; i++) //first term
 	{
 		for (j = i; j < n; j++){//last term
@@ -289,17 +313,60 @@ void enumMaxSubarray(int a[], int n, FILE *file){
 			}
 		}
 	}
+
+	end_time = clock();
+    total_time =(float)end_time - (float)start_time;
 	printArray(file, a, n, begin, end, best);
+
+	return total_time;
+}
+
+/* Randomly generate an array with "size" number of elements */
+int* randomArrayGenerator(int size) {
+    int i, rand_number;
+    int* arrayRow = malloc(sizeof(int) * size);
+    srand(time(NULL));
+    /* For each input size n and algorithm, collect at least 10 different input arrays */
+    for(i = 0; i < size - 1; i++) {
+        rand_number = (rand()% 100 + (-50));
+        arrayRow[i] = rand_number;
+    }
+        // Ensure at least one positive number;
+        rand_number = (rand()% 100);
+        arrayRow[size -1] = rand_number;
+
+    return arrayRow;
+}
+
+/* Deallocate Memory */
+void destroy(int* array) {
+    free(array);
 }
 
 
 int main(int argc, char *argv[]) {
-    FILE *file, *output;
+    FILE *file, *output, *testResults;
     file = fopen(argv[1], "r");
-    output = fopen("MSS_Results.txt", "a");
+    output = fopen("MSS_Results.txt", "w");
+    testResults = fopen("testResults.txt", "w");
     int* array1, *array2, *array3, *array4, *array5, *array6, *array7;
     int length[7];
 
+    // EXPERIMENTAL CODE
+    int i;
+    for(i = 0; i < 10; i++) {
+        int *arrayTest;
+        float time;
+        arrayTest = randomArrayGenerator(TESTSIZE);
+        // Place algorithm here
+        time = linearSubArray(arrayTest, TESTSIZE, testResults);
+        printf("%f, ", time);
+        destroy(arrayTest);
+    }
+
+    printf("\n");
+
+    /* START MSS_RESULTS */
     array1 = buildArray(40, file, &length[0]);
     array2 = buildArray(40, file, &length[1]);
     array3 = buildArray(40, file, &length[2]);
@@ -339,7 +406,9 @@ int main(int argc, char *argv[]) {
 	enumMaxSubarray(array5, length[4], output);
 	enumMaxSubarray(array6, length[5], output);
 	enumMaxSubarray(array7, length[6], output);
+    /* END MSS_RESULTS */
 
+    /* DEALLOCATION STEPS */
     free(array1);
     free(array2);
     free(array3);
@@ -347,8 +416,8 @@ int main(int argc, char *argv[]) {
     free(array5);
     free(array6);
     free(array7);
-
     fclose(file);
     fclose(output);
+    fclose(testResults);
 }
 

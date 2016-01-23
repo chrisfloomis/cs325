@@ -18,10 +18,7 @@ FILE = MSS_Results.txt
 
 all: main.c
 	gcc -o program main.c $(CFLAGS)
-	./program MSS_TestProblems.txt
-	echo "" >> $(FILE)
-	echo "" >> $(FILE)
-	echo "Next Algorithm goes here" >> $(FILE)
+	./program MSS_Problems.txt
 				
 clean:
 	rm -f MSS_Results.txt program
