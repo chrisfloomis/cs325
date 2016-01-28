@@ -45,6 +45,27 @@ int changedp(int V[], int size, int value){
                   table[i] = sub_res + 1;
           }
     }
+    
+    int countBack = table[value]; //gets number of coins
+    int n;
+    
+    int combo[size];    //holds combination of coints
+    for(i = 0; i < size; i++)
+        combo[i] = 0;   //put 0s in combo
+    
+    j = value;  //gets value which is used as index
+    
+    while(countBack > 0){
+        for(i = size-1; i >=0; i--){
+            n = j - V[i];
+            if(table[n] == table[j]-1){
+                combo[i]++;
+                j = n;
+                i = -1;      //break out of for loop
+            }
+        }
+    }
+    
     return table[value];
 }
 
@@ -53,9 +74,8 @@ int changegreedy(int V[], int size, int value){
     int count = 0, amount = 0;
     int combo[size];    //holds combination of coins used
     
-    for(i = 0; i < size; i++){
+    for(i = 0; i < size; i++)
         combo[i] = 0;   //put 0s in combo
-    }
 
     for(i = size - 1; i >= 0; i--) {
         currentValue = V[i];
