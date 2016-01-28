@@ -61,6 +61,7 @@ int changedp(int V[], int size, int value){
             if(table[n] == table[j]-1){
                 combo[i]++;
                 j = n;
+                countBack--;
                 i = -1;      //break out of for loop
             }
         }
