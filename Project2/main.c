@@ -51,16 +51,23 @@ int changedp(int V[], int size, int value){
 int changegreedy(int V[], int size, int value){
     int i, currentValue;
     int count = 0, amount = 0;
+    int combo[size];    //holds combination of coins used
+    
+    for(i = 0; i < size; i++){
+        combo[i] = 0;   //put 0s in combo
+    }
 
     for(i = size - 1; i >= 0; i--) {
         currentValue = V[i];
         while(amount < value ) {
             amount = amount + V[i];
             count++;
+            combo[i]++;
         }
         if(amount > value) {
             amount = amount - V[i];
             count--;
+            combo[i]--;
         }
     }
 
