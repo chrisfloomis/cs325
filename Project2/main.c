@@ -70,7 +70,7 @@ int changedp(int V[], int size, int value){
     return table[value];
 }
 
-int changegreedy(int V[], int size, int value){
+void changegreedy(int V[], int size, int value, int outputarr[], int outputSize){
     int i, currentValue;
     int count = 0, amount = 0;
     int combo[size];    //holds combination of coins used
@@ -91,18 +91,33 @@ int changegreedy(int V[], int size, int value){
             combo[i]--;
         }
     }
-
-    return count;
+	//print to consol the values in our output array
+	printf("outputarr:\n");
+	printf("C = [");
+	for(int i = 0; i < outputSize; i++)
+	{
+		printf("%d", outputarr[i]);
+		if(i < outputSize-1)
+		{
+			printf(", ");
+		}
+	}
+	printf("]\n");
+	
+    printf("m = %d\n", count);
 }
 
 
 // Driver program to test above function
 int main()
 {
-    int arr[] = {1, 2, 3};
+    int arr[] = {1, 2, 4, 8};
+	int outputarr[] = {0, 0, 0, 0};
+	int value = 15;
     int size = sizeof(arr)/sizeof(arr[0]);
-    printf("%d ", changedp(arr, size, 4));
-    printf("%d ", changeSlow(arr, size, 4));
-    printf("%d ", changegreedy(arr, size, 4));
+	int outputSize = sizeof(outputarr)/sizeof(outputarr[0]);
+    //printf("%d \n", changedp(arr, size, value));
+    //printf("%d \n", changeSlow(arr, size, value));
+	changegreedy(arr, size, value, outputarr, outputSize);
     return 0;
 }
