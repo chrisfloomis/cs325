@@ -1,23 +1,73 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
+#include <string.h> /* memset */
+
+
+struct Array {
+    int min;
+    int size;
+    int* V;
+    int* C;
+};
 
 /* Adapted from http://www.geeksforgeeks.org/find-minimum-number-of-coins-that-make-a-change/*/
-int changeSlow(int V[], int size, int value) {
-    int i, res, sub_res;
-   // base case, ya broke
-   if (value == 0) return 0;
-   // Initialize result
-   res = INT_MAX;
-   // Try every coin that has smaller value than V
-   for (i = 0; i< size; i++) {
-     if (V[i] <= value) {
-         sub_res = changeSlow(V, size, value-V[i]);
-         // Check for INT_MAX to avoid overflow and see if result can minimized
-         if ((sub_res != INT_MAX) && (sub_res + 1 < res))
-            res = sub_res + 1;
-     }
-   }
-   return res;
+struct Array changeSlowHelper(struct Array a, int value) {
+    struct Array subProblem;
+    int i, minCoins, numCoins;
+    // base case, ya broke
+    if (value == 0) {
+        a.min = 0;
+        return a;
+    }
+    // Initialize result
+    minCoins = value;
+    // Try every coin that has smaller value than target Value
+    for (i = 0; i< a.size; i++) {
+        if (a.V[i] <= value) {
+            // Reset coin counts
+            memset(a.C, 0, sizeof(int)*a.size);
+            subProblem = changeSlowHelper(a, value-a.V[i]);
+            // Incrementing the coin
+            subProblem.C[i]++;
+            numCoins = subProblem.min;
+            // Check for INT_MAX to avoid overflow and see if result can minimized
+            if ((numCoins != INT_MAX) && (numCoins + 1 < minCoins)) {
+                minCoins = numCoins + 1;
+                a.C = subProblem.C;
+            }
+        }
+    }
+    a.min = minCoins;
+    return a;
+}
+
+void changeSlow(int V[], int size, int value){
+    // Create Struct to hold Array Information
+    struct Array a;
+    a.V = V;
+    a.size = size;
+    int* coinArr = malloc(sizeof(int) * size);
+    memset(coinArr, 0, sizeof(int)*size);
+    a.C = coinArr;
+
+    a = changeSlowHelper(a, value);
+
+	//print to console the values in our output array
+	printf("\n***changeslow***\n");
+	printf("C = [");
+	int i;
+	for(i = 0; i < size; i++)
+	{
+		printf("%d", a.C[i]);
+		if(i < size-1)
+		{
+			printf(", ");
+		}
+	}
+	printf("]\n");
+    printf("m = %d\n", a.min);
+    free(coinArr);
 }
 
 /*Adapted from http://www.geeksforgeeks.org/find-minimum-number-of-coins-that-make-a-change/ */
@@ -45,16 +95,16 @@ void changedp(int V[], int size, int value){
                   table[i] = sub_res + 1;
           }
     }
-    
+
     int countBack = table[value]; //gets number of coins
     int n;
-    
+
     int combo[size];    //holds combination of coints
     for(i = 0; i < size; i++)
         combo[i] = 0;   //put 0s in combo
-    
+
     j = value;  //gets value which is used as index
-    
+
     while(countBack > 0){
         for(i = size-1; i >=0; i--){
             n = j - V[i];
@@ -65,7 +115,7 @@ void changedp(int V[], int size, int value){
             }
         }
     }
-    
+
 	//print to console the values in our output array
 	printf("\n***changedp***\n");
 	printf("C = [");
@@ -77,7 +127,7 @@ void changedp(int V[], int size, int value){
 			printf(", ");
 		}
 	}
-	printf("]\n");	
+	printf("]\n");
     printf("m = %d\n", table[value]);
 }
 
@@ -85,7 +135,7 @@ void changegreedy(int V[], int size, int value){
     int i, currentValue;
     int count = 0, amount = 0;
     int combo[size];    //holds combination of coins used
-    
+
     for(i = 0; i < size; i++)
         combo[i] = 0;   //put 0s in combo
 
@@ -102,7 +152,7 @@ void changegreedy(int V[], int size, int value){
             combo[i]--;
         }
     }
-	
+
 	//print to console the values in our output array
 	printf("\n***changegreedy***\n");
 	printf("C = [");
@@ -114,18 +164,17 @@ void changegreedy(int V[], int size, int value){
 			printf(", ");
 		}
 	}
-	printf("]\n");	
+	printf("]\n");
     printf("m = %d\n", count);
 }
 
-
-// Driver program to test above function
 int main()
 {
     int arr[] = {1, 2, 4, 8};
 	int value = 15;
     int size = sizeof(arr)/sizeof(arr[0]);
     //printf("%d \n", changeSlow(arr, size, value));
+    changeSlow(arr, size, value);
     changedp(arr, size, value);
 	changegreedy(arr, size, value);
     return 0;
