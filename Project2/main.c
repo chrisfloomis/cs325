@@ -21,7 +21,7 @@ int changeSlow(int V[], int size, int value) {
 }
 
 /*Adapted from http://www.geeksforgeeks.org/find-minimum-number-of-coins-that-make-a-change/ */
-int changedp(int V[], int size, int value){
+void changedp(int V[], int size, int value){
     int i, j;
     // table[i] will be storing the minimum number of coins
     // required for i value.  So table[value] will have result
@@ -62,12 +62,23 @@ int changedp(int V[], int size, int value){
                 combo[i]++;
                 j = n;
                 countBack--;
-                i = -1;      //break out of for loop
             }
         }
     }
     
-    return table[value];
+	//print to console the values in our output array
+	printf("\n***changedp***\n");
+	printf("C = [");
+	for(i = 0; i < size; i++)
+	{
+		printf("%d", combo[i]);
+		if(i < size-1)
+		{
+			printf(", ");
+		}
+	}
+	printf("]\n");	
+    printf("m = %d\n", table[value]);
 }
 
 void changegreedy(int V[], int size, int value){
@@ -91,8 +102,9 @@ void changegreedy(int V[], int size, int value){
             combo[i]--;
         }
     }
-	//print to consol the values in our output array
-	printf("outputarr:\n");
+	
+	//print to console the values in our output array
+	printf("\n***changegreedy***\n");
 	printf("C = [");
 	for(i = 0; i < size; i++)
 	{
@@ -102,8 +114,7 @@ void changegreedy(int V[], int size, int value){
 			printf(", ");
 		}
 	}
-	printf("]\n");
-	
+	printf("]\n");	
     printf("m = %d\n", count);
 }
 
@@ -114,8 +125,8 @@ int main()
     int arr[] = {1, 2, 4, 8};
 	int value = 15;
     int size = sizeof(arr)/sizeof(arr[0]);
-    //printf("%d \n", changedp(arr, size, value));
     //printf("%d \n", changeSlow(arr, size, value));
+    changedp(arr, size, value);
 	changegreedy(arr, size, value);
     return 0;
 }
