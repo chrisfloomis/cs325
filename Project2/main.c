@@ -70,7 +70,7 @@ int changedp(int V[], int size, int value){
     return table[value];
 }
 
-void changegreedy(int V[], int size, int value, int outputarr[], int outputSize){
+void changegreedy(int V[], int size, int value){
     int i, currentValue;
     int count = 0, amount = 0;
     int combo[size];    //holds combination of coins used
@@ -94,10 +94,10 @@ void changegreedy(int V[], int size, int value, int outputarr[], int outputSize)
 	//print to consol the values in our output array
 	printf("outputarr:\n");
 	printf("C = [");
-	for(int i = 0; i < outputSize; i++)
+	for(i = 0; i < size; i++)
 	{
-		printf("%d", outputarr[i]);
-		if(i < outputSize-1)
+		printf("%d", combo[i]);
+		if(i < size-1)
 		{
 			printf(", ");
 		}
@@ -112,12 +112,10 @@ void changegreedy(int V[], int size, int value, int outputarr[], int outputSize)
 int main()
 {
     int arr[] = {1, 2, 4, 8};
-	int outputarr[] = {0, 0, 0, 0};
 	int value = 15;
     int size = sizeof(arr)/sizeof(arr[0]);
-	int outputSize = sizeof(outputarr)/sizeof(outputarr[0]);
     //printf("%d \n", changedp(arr, size, value));
     //printf("%d \n", changeSlow(arr, size, value));
-	changegreedy(arr, size, value, outputarr, outputSize);
+	changegreedy(arr, size, value);
     return 0;
 }
