@@ -11,6 +11,21 @@ struct Array {
     int* C;
 };
 
+void printResults(FILE *output, int* C, int size, int min) {
+	int i;
+	fprintf(output, "[");
+	for(i = 0; i < size; i++)
+	{
+		fprintf(output, "%d", C[i]);
+		if(i < size-1)
+		{
+			fprintf(output, ", ");
+		}
+	}
+	fprintf(output, "]\n");
+    fprintf(output, "%d\n", min);
+}
+
 /* Adapted from http://www.geeksforgeeks.org/find-minimum-number-of-coins-that-make-a-change/*/
 struct Array changeSlowHelper(struct Array a, int value) {
     struct Array subProblem;
@@ -42,7 +57,7 @@ struct Array changeSlowHelper(struct Array a, int value) {
     return a;
 }
 
-void changeSlow(int V[], int size, int value){
+void changeSlow(int V[], int size, int value, FILE *output){
     // Create Struct to hold Array Information
     struct Array a;
     a.V = V;
@@ -67,11 +82,13 @@ void changeSlow(int V[], int size, int value){
 	}
 	printf("]\n");
     printf("m = %d\n", a.min);
+
+    printResults(output, a.C, size, a.min);
     free(coinArr);
 }
 
 /*Adapted from http://www.geeksforgeeks.org/find-minimum-number-of-coins-that-make-a-change/ */
-void changedp(int V[], int size, int value){
+void changedp(int V[], int size, int value, FILE *output){
     int i, j;
     // table[i] will be storing the minimum number of coins
     // required for i value.  So table[value] will have result
@@ -99,7 +116,7 @@ void changedp(int V[], int size, int value){
     int countBack = table[value]; //gets number of coins
     int n;
 
-    int combo[size];    //holds combination of coints
+    int combo[size];    //holds combination of coins
     for(i = 0; i < size; i++)
         combo[i] = 0;   //put 0s in combo
 
@@ -129,9 +146,11 @@ void changedp(int V[], int size, int value){
 	}
 	printf("]\n");
     printf("m = %d\n", table[value]);
+
+    printResults(output, combo, size, table[value]);
 }
 
-void changegreedy(int V[], int size, int value){
+void changegreedy(int V[], int size, int value, FILE *output){
     int i, currentValue;
     int count = 0, amount = 0;
     int combo[size];    //holds combination of coins used
@@ -166,16 +185,31 @@ void changegreedy(int V[], int size, int value){
 	}
 	printf("]\n");
     printf("m = %d\n", count);
+
+
+    printResults(output, combo, size, count);
 }
 
 int main()
 {
+    FILE *output;
+    // ! Change to [inputFileName]Change.txt after done with input functions !!
+    output = fopen("change.txt", "w");
+
     int arr[] = {1, 2, 4, 8};
 	int value = 15;
     int size = sizeof(arr)/sizeof(arr[0]);
-    //printf("%d \n", changeSlow(arr, size, value));
-    changeSlow(arr, size, value);
-    changedp(arr, size, value);
-	changegreedy(arr, size, value);
+
+    fprintf(output, "changeSlow\n");
+    changeSlow(arr, size, value, output);
+
+    fprintf(output, "changedp\n");
+    changedp(arr, size, value, output);
+
+    fprintf(output, "changegreedy\n");
+	changegreedy(arr, size, value, output);
+
+	close(output);
+
     return 0;
 }
