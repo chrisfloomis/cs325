@@ -190,13 +190,74 @@ void changegreedy(int V[], int size, int value, FILE *output){
     printResults(output, combo, size, count);
 }
 
-int main()
+int** buildArrays(FILE* input, int* length, int* target, int* lineCount) {
+    char str1;
+    int** biggerArray = (int**)malloc(sizeof(int) * 20);
+    int i = 0, j;
+    while(!feof(input)) {
+        j = 0;
+
+        // Extract Array
+        int* array = malloc(sizeof(int) * 40);
+        fscanf(input, "%c", &str1);
+        do {
+            fscanf(input, "%d", &array[j]);
+            fscanf(input, "%c", &str1);
+            j++;
+        }while(str1 == ',');
+
+        length[i] = j;
+        biggerArray[i] = array;
+
+        //Extract Target Value, strip newlines, store target value
+        fscanf(input, "%c", &str1);
+        fscanf(input, "%d", &target[i]);
+        fscanf(input, "%c", &str1);
+        i++;
+    }
+
+    *lineCount = i;
+    return biggerArray;
+}
+
+void destroy(int** arrays, int* lengths, int* targets, int line_count) {
+    int i;
+    for(i = 0; i < line_count; i++) {
+        free(arrays[i]);
+    }
+    free(arrays);
+    free(lengths);
+    free(targets);
+}
+
+int main(int argc, char *argv[])
 {
-    FILE *output;
+    int** arrays;
+    int* lengths = malloc(sizeof(int) * 20);
+    int* targets = malloc(sizeof(int) * 20);
+    int line_count;
+    FILE *output, *input;
+    input = fopen("CoinW16.txt", "r");
     // ! Change to [inputFileName]Change.txt after done with input functions !!
     output = fopen("change.txt", "w");
 
-    int arr[] = {1, 2, 4, 8};
+    arrays = buildArrays(input, lengths, targets, &line_count);
+
+    // Debug Code
+    int i, j;
+    for(i = 0; i < line_count; i++) {
+        printf("ROW %d: ", i);
+        for(j = 0; j < lengths[i]; j++) {
+            printf("%d ", arrays[i][j]);
+        }
+        printf("TARGET: %d\n", targets[i]);
+    }
+
+    for(i = 0; i < line_count; i++) {
+        changedp(arrays[i], lengths[i], targets[i], output);
+    }
+
+    /*int arr[] = {1, 2, 4, 8};
 	int value = 15;
     int size = sizeof(arr)/sizeof(arr[0]);
 
@@ -207,9 +268,11 @@ int main()
     changedp(arr, size, value, output);
 
     fprintf(output, "changegreedy\n");
-	changegreedy(arr, size, value, output);
+	changegreedy(arr, size, value, output);*/
 
 	close(output);
+    close(input);
+    destroy(arrays, lengths, targets, line_count);
 
     return 0;
 }
