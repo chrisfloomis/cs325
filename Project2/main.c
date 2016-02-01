@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h> /* memset */
+#include <time.h>
 
 
 struct Array {
@@ -9,6 +10,7 @@ struct Array {
     int size;
     int* V;
     int* C;
+	float total_time;
 };
 
 void printResults(FILE *output, int* C, int size, int min) {
@@ -30,6 +32,8 @@ void printResults(FILE *output, int* C, int size, int min) {
 struct Array changeSlowHelper(struct Array a, int value) {
     struct Array subProblem;
     int i, minCoins, numCoins;
+	clock_t start_time, end_time;
+
     // base case, ya broke
     if (value == 0) {
         a.min = 0;
@@ -37,6 +41,8 @@ struct Array changeSlowHelper(struct Array a, int value) {
     }
     // Initialize result
     minCoins = value;
+	
+	start_time = clock();
     // Try every coin that has smaller value than target Value
     for (i = 0; i< a.size; i++) {
         if (a.V[i] <= value) {
@@ -54,6 +60,9 @@ struct Array changeSlowHelper(struct Array a, int value) {
         }
     }
     a.min = minCoins;
+	end_time = clock();
+    a.total_time =(float)end_time - (float)start_time;
+
     return a;
 }
 
@@ -84,6 +93,8 @@ void changeSlow(int V[], int size, int value, FILE *output){
     printf("m = %d\n", a.min);
 
     printResults(output, a.C, size, a.min);
+	printf("Time: %d\n", a.total_time);
+
     free(coinArr);
 }
 
@@ -96,11 +107,15 @@ void changedp(int V[], int size, int value, FILE *output){
 
     // Base case (If given value is 0)
     table[0] = 0;
+	
+	float total_time; 
+	clock_t start_time, end_time;
 
-    // Initialize all table values as Infinite
-    for (i = 1; i <= value; i++)
+	// Initialize all table values as Infinite
+    for (i = 1; i <= value; i++) // Constant work not included in the timer.  This is work that we don't care about asymptomatically speaking
         table[i] = INT_MAX;
 
+	start_time = clock();
     // Compute minimum coins required for all
     // values from 1 to value
     for (i = 1; i <= value; i++){
@@ -112,7 +127,10 @@ void changedp(int V[], int size, int value, FILE *output){
                   table[i] = sub_res + 1;
           }
     }
+	end_time = clock();
+    total_time =(float)end_time - (float)start_time;
 
+	// Not included in timer as this is not part of the asymptomatic analysis
     int countBack = table[value]; //gets number of coins
     int n;
 
@@ -148,13 +166,17 @@ void changedp(int V[], int size, int value, FILE *output){
     printf("m = %d\n", table[value]);
 
     printResults(output, combo, size, table[value]);
+	printf("Time: %d\n", total_time);
 }
 
 void changegreedy(int V[], int size, int value, FILE *output){
     int i, currentValue;
     int count = 0, amount = 0;
     int combo[size];    //holds combination of coins used
+	float total_time;
+	clock_t start_time, end_time;
 
+	start_time = clock();
     for(i = 0; i < size; i++)
         combo[i] = 0;   //put 0s in combo
 
@@ -171,6 +193,8 @@ void changegreedy(int V[], int size, int value, FILE *output){
             combo[i]--;
         }
     }
+	end_time = clock();
+	total_time =(float)end_time - (float)start_time;
 
 	//print to console the values in our output array
 	printf("\n***changegreedy***\n");
@@ -188,6 +212,7 @@ void changegreedy(int V[], int size, int value, FILE *output){
 
 
     printResults(output, combo, size, count);
+	printf("Time: %d\n", total_time);
 }
 
 int** buildArrays(FILE* input, int* length, int* target, int* lineCount) {
