@@ -41,7 +41,11 @@ struct Array changeSlowHelper(struct Array a, int value) {
     }
     // Initialize result
     minCoins = value;
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> 291252d8ae76ca41a71eb7abc086bc7de776714c
 	start_time = clock();
     // Try every coin that has smaller value than target Value
     for (i = 0; i< a.size; i++) {
@@ -107,10 +111,16 @@ void changedp(int V[], int size, int value, FILE *output){
 
     // Base case (If given value is 0)
     table[0] = 0;
+	
+	float total_time; 
+	clock_t start_time, end_time;
 
+<<<<<<< HEAD
 	float total_time;
 	clock_t start_time, end_time;
 
+=======
+>>>>>>> 291252d8ae76ca41a71eb7abc086bc7de776714c
 	// Initialize all table values as Infinite
     for (i = 1; i <= value; i++) // Constant work not included in the timer.  This is work that we don't care about asymptomatically speaking
         table[i] = INT_MAX;
