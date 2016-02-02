@@ -4,7 +4,6 @@
 #include <string.h> /* memset */
 #include <time.h>
 
-
 struct Array {
     int min;
     int size;
@@ -92,7 +91,7 @@ void changeSlow(int V[], int size, int value, FILE *output){
     printf("m = %d\n", a.min);
 
     printResults(output, a.C, size, a.min);
-	printf("Time: %d\n", a.total_time);
+	printf("Time: %f\n", a.total_time);
 
     free(coinArr);
 }
@@ -164,7 +163,7 @@ void changedp(int V[], int size, int value, FILE *output){
     printf("m = %d\n", table[value]);
 
     printResults(output, combo, size, table[value]);
-	printf("Time: %d\n", total_time);
+	printf("Time: %f\n", total_time);
 }
 
 void changegreedy(int V[], int size, int value, FILE *output){
@@ -210,7 +209,7 @@ void changegreedy(int V[], int size, int value, FILE *output){
 
 
     printResults(output, combo, size, count);
-	printf("Time: %d\n", total_time);
+	printf("Time: %f\n", total_time);
 }
 
 int** buildArrays(FILE* input, int* length, int* target, int* lineCount) {
@@ -254,7 +253,8 @@ void destroy(int** arrays, int* lengths, int* targets, int line_count) {
 }
 
 int main(int argc, char *argv[]){
-    int i, j;
+    int i;
+	//int j;
     int** arrays;
     int* lengths = malloc(sizeof(int) * 20);
     int* targets = malloc(sizeof(int) * 20);

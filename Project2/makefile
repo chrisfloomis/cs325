@@ -1,8 +1,8 @@
-CFLAGS = -Wall -fpic -lm -std=c99
+CFLAGS = -Wall -fpic -lm -std=c99 -w
 
-all: maintest.c
-	gcc -o program maintest.c $(CFLAGS)
-	./program
+all: main.c
+	gcc -o program main.c $(CFLAGS)
+	./program CoinW16.txt
 				
 clean:
 	rm -f program
