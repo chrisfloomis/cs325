@@ -286,9 +286,9 @@ int main(int argc, char *argv[]){
         printf("TARGET: %d\n", targets[i]);
     }*/
 
-    /*for(i = 0; i < line_count; i++) {
+    for(i = 0; i < line_count; i++) {
         changeSlow(arrays[i], lengths[i], targets[i], output);
-    }*/
+    }
 
     for(i = 0; i < line_count; i++) {
         changedp(arrays[i], lengths[i], targets[i], output);
