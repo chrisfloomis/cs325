@@ -21,9 +21,9 @@ int** buildArrays(FILE* input, int* lineCount) {
         int* array = malloc(sizeof(int) * 3);
         // Extract City Identifier
         fscanf(input, "%d", &array[0]);
-        // Extract 2nd city x-coordinate
+        // Extract x-coordinate
         fscanf(input, "%d", &array[1]);
-        // Extract 3rd city y-coordinate
+        // Extract y-coordinate
         fscanf(input, "%d", &array[2]);
         // Strip newline
         fscanf(input, "%c", &str1);
