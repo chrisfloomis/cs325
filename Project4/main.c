@@ -9,6 +9,7 @@
 #include <limits.h>
 #include <string.h> /* memset */
 #include <time.h>
+#include <math.h>
 
 int** buildArrays(FILE* input, int* lineCount) {
     char str1;
@@ -44,6 +45,29 @@ void destroy(int** arrays, int line_count) {
     free(arrays);
 }
 
+int pythag(int x1, int x2, int y1, int y2){
+	return round(sqrt(pow((x1-x2),2) + pow((y1-y2),2)));
+}
+
+//takes the biggerArray of the cities and the number of them
+//creates and returns a cost matrix of each city to each other city
+//costMatrix[0][1] will hold the distance from the first city read in from input to the second read from input
+int** buildCostMatrix(int** cities, int* lineCount){
+	int i,j;
+	int** costMatrix = (int**)malloc(sizeof(int) * 20000);	//copy/paste from buildArrays()
+	//for each city
+	for(i=0;i<lineCount;i++){
+		//call pythag from current city to each other city
+		for(j=0;j<lineCount;j++){
+			if(i==j)
+				costMatrix[i][j] = 0;
+			else
+				costMatrix[i][j] = pythag(cities[i][1],cities[j][1],cities[i][2],cities[j][2]);
+		}
+	}
+	
+	return costMatrix;
+}
 
 int main(int argc, char *argv[]){
     int i, j;
