@@ -11,6 +11,7 @@
 #include <time.h>
 #include <math.h>
 
+
 int** buildArrays(FILE* input, int* lineCount) {
     char str1;
     // Look into a way to not have to hard-code this?
@@ -37,14 +38,6 @@ int** buildArrays(FILE* input, int* lineCount) {
     return biggerArray;
 }
 
-void destroy(int** arrays, int line_count) {
-    int i;
-    for(i = 0; i < line_count; i++) {
-        free(arrays[i]);
-    }
-    free(arrays);
-}
-
 int pythag(int x1, int x2, int y1, int y2){
 	return round(sqrt(pow((x1-x2),2) + pow((y1-y2),2)));
 }
@@ -52,21 +45,33 @@ int pythag(int x1, int x2, int y1, int y2){
 //takes the biggerArray of the cities and the number of them
 //creates and returns a cost matrix of each city to each other city
 //costMatrix[0][1] will hold the distance from the first city read in from input to the second read from input
-int** buildCostMatrix(int** cities, int* lineCount){
+int** buildCostMatrix(int** cities, int lineCount){
 	int i,j;
 	int** costMatrix = (int**)malloc(sizeof(int) * 20000);	//copy/paste from buildArrays()
 	//for each city
-	for(i=0;i<lineCount;i++){
+	for(i = 0; i < lineCount; i++){
+        // allocate space for row
+        int* row = malloc(sizeof(int) * lineCount);
 		//call pythag from current city to each other city
-		for(j=0;j<lineCount;j++){
-			if(i==j)
-				costMatrix[i][j] = 0;
+		for(j = 0; j < lineCount; j++){
+			if(i == j)
+				row[j] = 0;
 			else
-				costMatrix[i][j] = pythag(cities[i][1],cities[j][1],cities[i][2],cities[j][2]);
+				row[j] = pythag(cities[i][1],cities[j][1],cities[i][2],cities[j][2]);
 		}
+        costMatrix[i] = row;
 	}
-	
 	return costMatrix;
+}
+
+void destroy(int** cities, int** costM, int line_count) {
+    int i;
+    for(i = 0; i < line_count; i++) {
+        free(cities[i]);
+        free(costM[i]);
+    }
+    free(cities);
+    free(costM);
 }
 
 int main(int argc, char *argv[]){
@@ -88,20 +93,32 @@ int main(int argc, char *argv[]){
     outputFile = strcat(fileName, endFile);
     output = fopen(outputFile, "w");
 
-    /* Copy Arrays */
-    int** arrays;
-    int line_count;
-    arrays = buildArrays(input, &line_count);
+    /* Copy Cities */
+    int** cities;
+    int lineCount;
+    cities = buildArrays(input, &lineCount);
 
-    // Debug Code
-    for(i = 0; i < line_count; i++) {
+    // Debug Code - print cities
+    /*for(i = 0; i < lineCount; i++) {
         for(j = 0; j < 3; j++) {
-            printf("%d ", arrays[i][j]);
+            printf("%d ", cities[i][j]);
         }
         printf("\n");
-    }
+    }*/
 
-    destroy(arrays, line_count);
+    /* Create Cost Matrix */
+    int** costM;
+    costM = buildCostMatrix(cities, lineCount);
+
+    // Debug Code - print Cost Matrix
+    /*for(i = 0; i < lineCount; i++) {
+        for(j = 0; j < lineCount; j++) {
+            printf("%d ", costM[i][j]);
+        }
+        printf("\n");
+    }*/
+
+    destroy(cities, costM, lineCount);
 	close(output);
     close(input);
     return 0;
