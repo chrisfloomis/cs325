@@ -1,7 +1,11 @@
-/* Project 3
+/* Project 3 - Traveling Salesman Problem
+    Group 9:
     Christopher Loomis
     Benjamin Tullis
     Dalena Pham
+
+    Sources:
+    http://www.ccodechamp.com/c-program-of-travelling-salesman-problem/
 */
 
 #include <stdio.h>
@@ -55,7 +59,7 @@ int** buildCostMatrix(int** cities, int lineCount){
 		//call pythag from current city to each other city
 		for(j = 0; j < lineCount; j++){
 			if(i == j)
-				row[j] = 0;
+				row[j] = INT_MAX;
 			else
 				row[j] = pythag(cities[i][1],cities[j][1],cities[i][2],cities[j][2]);
 		}
@@ -64,6 +68,46 @@ int** buildCostMatrix(int** cities, int lineCount){
 	return costMatrix;
 }
 
+
+/* Finds the minimum value in both the row and column of a cost matrix,
+subtracts this value from the cost matrix
+ */
+void subtractMinimum(int** costM, int lineCount) {
+    int i, j;
+    /* Find the minimum value of each row, subtract
+    each value in row by minimum value */
+    int minRow;
+    for(i = 0; i < lineCount; i++) {
+        minRow = costM[i][0];
+        /* Find the minimum element in each row */
+        for(j = 0; j < lineCount; j++) {
+            if (costM[i][j] < minRow)
+                minRow = costM[i][j];
+        }
+        /* Subtract the minimum element from each row */
+        for (j = 0; j < lineCount; j++) {
+            costM[i][j] = costM[i][j] - minRow;
+        }
+    }
+
+    /* Find minimum value in each column, subtract
+    each value in column by minimum value */
+    int minCol;
+    for(i = 0; i < lineCount; i++) {
+        minCol = costM[0][i];
+        /* Find minimum element in each column */
+        for(j = 0; j < lineCount; j++) {
+            if(costM[j][i] < minCol)
+                minCol = costM[j][i];
+        }
+        /* Subtract the minimum element from each column */
+        for(j = 0; j < lineCount; j++) {
+            costM[j][i] = costM[j][i] - minCol;
+        }
+    }
+}
+
+/* Deallocates reserved memory */
 void destroy(int** cities, int** costM, int line_count) {
     int i;
     for(i = 0; i < line_count; i++) {
@@ -117,6 +161,9 @@ int main(int argc, char *argv[]){
         }
         printf("\n");
     }*/
+
+    /* Zero out rows and columns */
+    subtractMinimum(costM, lineCount);
 
     destroy(cities, costM, lineCount);
 	close(output);
