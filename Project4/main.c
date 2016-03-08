@@ -165,6 +165,131 @@ int main(int argc, char *argv[]){
     /* Zero out rows and columns */
     subtractMinimum(costM, lineCount);
 
+    /* To-do, put the following into function and figure what it all means */
+    int flag[lineCount][lineCount];
+    int nrz[lineCount];
+    int ncz[lineCount];
+
+    int nrz1[lineCount];
+    int ncz1[lineCount];
+
+    // a = minimum number of lines
+    int a = 0, noz = 0;
+    // Initializing all flag spots to 0
+    for(i = 0; i < lineCount; i++) {
+        for(j = 0; j < lineCount; j++) {
+            flag[i][j] = 0;
+        }
+    }
+
+    int cn;
+    // Count and mark number of zeros in rows
+    for(i = 0; i < lineCount; i++) {
+        cn = 0;
+        for(j = 0; j < lineCount; j++) {
+            if(costM[i][j] == 0) {
+                cn++;
+                flag[i][j] = 1;
+            }
+        }
+        // Record number of zeros in specific row
+        nrz[i] = cn;
+        // Record overall number of zeros
+        noz = noz + cn;
+    }
+
+    // Count and mark number of zeros in columns
+    for(i = 0; i < lineCount; i++) {
+        cn = 0;
+        for(j = 0; j < lineCount; j++) {
+            if(costM[j][i] == 0) {
+                cn++;
+                flag[j][i] = 1;
+            }
+        }
+        // Record number of zeros in specific column
+        ncz[i] = cn;
+        // Record overall number of zeros
+        noz = noz + cn;
+    }
+
+    // Copy arrays recording number of zeros in rows and columns
+    for(i = 0; i < lineCount; i++) {
+        nrz1[i] = nrz[i];
+        ncz1[i] = ncz[i];
+    }
+
+    int k = 0;
+    // while there is row or column that has a zero in it
+    while(nrz[k] != 0 || ncz[k] != 0) {
+
+        for(i = 0; i < lineCount; i++) {
+            // Count number of flagged spots in row, record in nrz
+            cn = 0;
+            for(j = 0; j < lineCount; j++) {
+                if(flag[i][j] == 1)
+                    cn++;
+                nrz[i] = cn;
+            }
+
+            // If there is only 1 flag in row
+            if(nrz[i] == 1) {
+                for(j = 0; j < lineCount; j++) {
+                    // Find the flag
+                    if(flag[i][j] == 1) {
+                        // Reassign it
+                        flag[i][j] = 2;
+                        // Find other flags in column
+                        for(k = 0; k < lineCount; k++) {
+                            // Reassign flag
+                            if(flag[k][j] == 1) {
+                                flag[k][j] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Traverse through columns
+        for(i = 0; i < lineCount; i++) {
+            cn = 0;
+            // Count number of flags in column
+            for(j = 0; j < lineCount; j++) {
+                if(flag[j][i] == 1) {
+                    cn++;
+                    ncz[i] = cn;
+                }
+            }
+            // If there was only 1 flag in column
+            if(ncz[i] == 1) {
+                for(j = 0; j < lineCount; j++) {
+                    // Search for that flag
+                    if(flag[j][i] == 1) {
+                        // Reassign it
+                        flag[j][i] = 2;
+                        // Find all other flags in row, reassign to 0
+                        for(k = 0; k < lineCount; k++) {
+                            if(flag[j][k] == 1) {
+                                flag[j][k] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        k++;
+    }
+
+    a = 0;
+    for(i = 0; i < lineCount; i++) {
+        for(j = 0; j < lineCount; j++) {
+            if(flag[i][j] == 2) {
+                a++;
+            }
+        }
+    }
+
     destroy(cities, costM, lineCount);
 	close(output);
     close(input);
