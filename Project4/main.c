@@ -107,6 +107,47 @@ void subtractMinimum(int** costM, int lineCount) {
     }
 }
 
+int tsp_dp (int** c, int* tour, int start, int n) {
+    int i, j, k; /* Loop counters. */
+    int* temp = malloc(sizeof(int) * n); /* Temporary during calculations. */
+    int* mintour = malloc(sizeof(int) * n); /* Minimal tour array. */
+    int mincost; /* Minimal cost. */
+    int ccost; /* Current cost. */
+
+    /* End of recursion condition. */
+    if (start == n - 2)
+    return c[tour[n-2]][tour[n-1]] + c[tour[n-1]][0];
+
+    /* Compute the tour starting from the current city. */
+    mincost = INT_MAX;
+        for (i = start+1; i<n; i++){
+        for (j=0; j<n; j++)
+        temp[j] = tour[j];
+
+        /* Adjust positions. */
+        temp[start+1] = tour[i];
+        temp[i] = tour[start+1];
+
+        /* Found a better cycle? (Recurrence derivable.) */
+        if (c[tour[start]][tour[i]] +
+            (ccost = tsp_dp (c, temp, start+1, n)) < mincost) {
+            mincost = c[tour[start]][tour[i]] + ccost;
+            for (k=0; k<n; k++)
+                mintour[k] = temp[k];
+            }
+    }
+
+    /* Set the minimum-tour array. */
+    for (i=0; i<n; i++)
+        tour[i] = mintour[i];
+
+
+    free(temp);
+    free(mintour);
+
+    return mincost;
+}
+
 /* Deallocates reserved memory */
 void destroy(int** cities, int** costM, int line_count) {
     int i;
@@ -173,6 +214,8 @@ int main(int argc, char *argv[]){
     int nrz1[lineCount];
     int ncz1[lineCount];
 
+
+    int min = INT_MAX;
     // a = minimum number of lines
     int a = 0, noz = 0;
     // Initializing all flag spots to 0
@@ -289,6 +332,112 @@ int main(int argc, char *argv[]){
             }
         }
     }
+
+    if (a == lineCount) {
+        fprintf(output, "%d\n", a);
+        for(i = 0; i < lineCount; i++) {
+            for(j = 0; j < lineCount; j++) {
+                if(flag[i][j] == 2) {
+                    fprintf(output, "%d\n", i);
+                }
+            }
+        }
+    }
+
+    else {
+        int rf[lineCount];
+        int sr[lineCount];
+        int cf[lineCount];
+        int sc[lineCount];
+
+        // Initialize all to zero
+        for(i = 0; i < lineCount; i++) {
+            rf[i] = 0;
+            sr[i] = 0;
+            cf[i] = 0;
+            sc[i] = 0;
+        }
+
+        int m;
+        for(k = lineCount; (k > 0 && noz != 0); k--) {
+            for(i = 0; i < lineCount; i++) {
+               m = 0;
+                for(j = 0; j < lineCount; j++) {
+                    if((flag[i][j] == 4)&&(costM[i][j] == 0))
+                        m++;
+                }
+                sr[i] = m;
+            }
+
+            for(i = 0; i < lineCount; i++) {
+                if(nrz1[i] == k && nrz1[i] != sr[i]) {
+                    rf[i] = 1;
+                    for(j = 0; j < lineCount; j++) {
+                        if(costM[i][j] == 0)
+                            flag[i][j] = 4;
+                    }
+                    noz = noz - k;
+                }
+            }
+            int l;
+            for(i = 0; i < lineCount; i++) {
+                l = 0;
+                for(j = 0; j < lineCount; j++) {
+                    if((flag[j][i] == 4) && (costM[j][i] == 0))
+                        l++;
+                }
+                sc[i] = l;
+            }
+
+            for(i = 0; i < lineCount; i++) {
+                if(ncz1[i] == k && ncz1[i] != sc[i]) {
+                    cf[i] = 1;
+                    for(j = 0; j < lineCount; j++) {
+                        if(costM[j][i] == 0)
+                            flag[j][i] = 4;
+                    }
+                    noz = noz - k;
+                }
+            }
+
+            for(i = 0; i < lineCount; i++) {
+                for (j = 0; j < lineCount; j++) {
+                    if(flag[i][j] != 3) {
+                        if(rf[i] == 1 && cf[j] == 1) {
+                            flag[i][j] = 3;
+                            if(cost[i][j] == 0)
+                                noz = noz + 1;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        for(i = 0; i < lineCount; i++) {
+            for(j = 0; j < lineCount; j++) {
+                if(rf[i] != 1 && cf[j] != 1) {
+                    if(min > costM[i][j])
+                        min = cost[i][j];
+                }
+            }
+        }
+
+        for(i = 0; i < lineCount; i++) {
+            for(j = 0; j < lineCount; j++) {
+                if(rf[i] != 1 && cf[j] != 1)
+                    cost[i][j] = cost[i][j] - min;
+            }
+        }
+
+        for(i = 0; i < lineCount; i++) {
+            for(j = 0; j < lineCount; j++) {
+                if(flag[i][j] == 3)
+                    cost[i][j] = cost[i][j] + min;
+            }
+        }
+    }
+
 
     destroy(cities, costM, lineCount);
 	close(output);
