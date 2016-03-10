@@ -104,13 +104,11 @@ int main(int argc, char *argv[]){
     /* Where the magic happens */
     int routeTable[lineCount][lineCount + 1];
     int visited [lineCount];
-    int whileCounter;
     int distance, tempDistance, minDistance;
     int current, candidateCity;
 
     // For every city
     for(i = 0; i < lineCount; i++) {
-        whileCounter = lineCount - 1;
         distance = 0;
 
        // Initialize visited array to 0
