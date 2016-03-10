@@ -58,18 +58,18 @@ int** buildCostMatrix(int** cities, int lineCount){
 }
 
 /* Deallocates reserved memory */
-void destroy(int** cities, int** costM, int line_count) {
+void destroy(int** cities, int line_count) {
     int i;
     for(i = 0; i < line_count; i++) {
         free(cities[i]);
-        free(costM[i]);
     }
     free(cities);
-    free(costM);
 }
 
 int main(int argc, char *argv[]){
-    int i, j;
+    int i, j, k;
+	clock_t start_time, end_time;
+	float total_time;
 
     /* File Input/Output Variables */
     FILE *output, *input;
@@ -93,27 +93,23 @@ int main(int argc, char *argv[]){
     cities = buildArrays(input, &lineCount);
 
     /* Create Cost Matrix */
-    int** costM;
-    costM = buildCostMatrix(cities, lineCount);
-
+    //int** costM;
+    //costM = buildCostMatrix(cities, lineCount);
 
     // Route variable structure:
     // 1st element is the total distance of path
     // Subsequent elements are the actual path traversal
 
     /* Where the magic happens */
-	//Origional Line caused stackoverflow as 2D array was too huge with 15112 cities in example3.
-    //int routeTable[lineCount][lineCount + 1];
-	int** routeTable = (int**)malloc(lineCount);
-	for (int i = 0; i < lineCount; i++)
-	{
-		routeTable[i] = (int*)malloc(lineCount + 1);
-	}
+	int tempRoute [lineCount + 1];                  // Keep track of temporary route
+	int minRoute [lineCount + 1];                   // Will hold the overall minimum route
     int visited [lineCount];
-    int distance, tempDistance, minDistance;
+    int distance, tempDistance, minDistance, minDistance_all;
     int current, candidateCity;
 
     // For every city
+    minDistance_all = INT_MAX;
+	start_time = clock();
     for(i = 0; i < lineCount; i++) {
         distance = 0;
 
@@ -124,13 +120,11 @@ int main(int argc, char *argv[]){
                 visited[j] = 1;
             }
         }
-
         // First city is current city
         current = i;
         // First city in route is current city
-        routeTable[i][1] = current;
+        tempRoute[1] = current;
 
-        int k;
         // We have lineCount visits to check and visit
         for(k = 1; k < lineCount; k++) {
             minDistance = INT_MAX;
@@ -138,7 +132,7 @@ int main(int argc, char *argv[]){
             for(j = 0; j < lineCount; j++) {
                 if(visited[j] == 0) {
                     // Check distance from current city to candidate city
-                    tempDistance = costM[current][j];
+                    tempDistance = pythag(cities[current][1],cities[j][1],cities[current][2],cities[j][2]);
                     // Keep track of the closest candidate city
                     if(tempDistance < minDistance) {
                         minDistance = tempDistance;
@@ -148,34 +142,35 @@ int main(int argc, char *argv[]){
             }
             // Save and move to best candidate city
             visited[candidateCity] = 1;
-            routeTable[i][k + 1] = candidateCity;
+            tempRoute[k + 1] = candidateCity;
             current = candidateCity;
             distance += minDistance;
         }
 
         // Get final distance back to original city
-        tempDistance = costM[current][i];
+        tempDistance = pythag(cities[current][1],cities[i][1],cities[current][2],cities[i][2]);
         distance += tempDistance;
-        routeTable[i][lineCount+1] = i;
-        routeTable[i][0] = distance;
-    }
+        tempRoute[0] = distance;
 
-    minDistance = INT_MAX;
-    int optimal_route;
-    // Find the route with the lowest distance
-    for(i = 0; i < lineCount; i++) {
-        if(routeTable[i][0] < minDistance) {
-            minDistance = routeTable[i][0];
-            optimal_route = i;
+        // If this route produces a smaller distance, keep it
+        if(distance < minDistance_all) {
+            minDistance_all = distance;
+            for(j = 0; j < lineCount + 1; j++) {
+                minRoute[j] = tempRoute[j];
+            }
         }
     }
+	end_time = clock();
+	total_time =(float)end_time - (float)start_time;
     /* End Magic */
 
     for(i = 0; i < lineCount + 1; i++) {
-        fprintf(output, "%d\n", routeTable[optimal_route][i]);
+        fprintf(output, "%d\n", minRoute[i]);
     }
 
-    destroy(cities, costM, lineCount);
+	printf("Time: %f\n", total_time);
+
+    destroy(cities, lineCount);
 	close(output);
     close(input);
     return 0;
