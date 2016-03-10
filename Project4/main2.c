@@ -150,7 +150,6 @@ int main(int argc, char *argv[]){
         }
 
         // Get final distance back to original city
-        //tempDistance = costM[current][i];
         tempDistance = costM[current][i];
         distance += tempDistance;
         routeTable[i][lineCount+1] = i;
