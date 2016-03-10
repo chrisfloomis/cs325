@@ -102,7 +102,13 @@ int main(int argc, char *argv[]){
     // Subsequent elements are the actual path traversal
 
     /* Where the magic happens */
-    int routeTable[lineCount][lineCount + 1];
+	//Origional Line caused stackoverflow as 2D array was too huge with 15112 cities in example3.
+    //int routeTable[lineCount][lineCount + 1];
+	int** routeTable = (int**)malloc(lineCount);
+	for (int i = 0; i < lineCount; i++)
+	{
+		routeTable[i] = (int*)malloc(lineCount + 1);
+	}
     int visited [lineCount];
     int distance, tempDistance, minDistance;
     int current, candidateCity;
