@@ -68,6 +68,7 @@ void destroy(int** cities, int line_count) {
 
 int main(int argc, char *argv[]){
     int i, j, k;
+    int largeFile = 0;              // Program will change behavior depending on number of cities given
 	clock_t start_time, end_time;
 	float total_time;
 
@@ -92,6 +93,15 @@ int main(int argc, char *argv[]){
     int lineCount;
     cities = buildArrays(input, &lineCount);
 
+    // Determine the number of times to loop in the greedy loop
+    int greedyCount;
+    if(lineCount > 2000) {
+        greedyCount = 350;
+        largeFile = 1;
+    } else {
+        greedyCount = lineCount;
+    }
+
     /* Create Cost Matrix */
     //int** costM;
     //costM = buildCostMatrix(cities, lineCount);
@@ -105,12 +115,13 @@ int main(int argc, char *argv[]){
 	int minRoute [lineCount + 1];                   // Will hold the overall minimum route
     int visited [lineCount];
     int distance, tempDistance, minDistance, minDistance_all;
-    int current, candidateCity;
+    int current, candidateCity, originCity;
 
     // For every city
     minDistance_all = INT_MAX;
 	start_time = clock();
-    for(i = 0; i < lineCount; i++) {
+
+    for(i = 0; i < greedyCount; i++) {
         distance = 0;
 
        // Initialize visited array to 0
@@ -121,7 +132,13 @@ int main(int argc, char *argv[]){
             }
         }
         // First city is current city
-        current = i;
+        originCity = i;
+        if(largeFile) {
+            srand(time(NULL));
+            originCity = (rand()% lineCount + 1);
+        }
+        current = originCity;
+
         // First city in route is current city
         tempRoute[1] = current;
 
@@ -148,7 +165,7 @@ int main(int argc, char *argv[]){
         }
 
         // Get final distance back to original city
-        tempDistance = pythag(cities[current][1],cities[i][1],cities[current][2],cities[i][2]);
+        tempDistance = pythag(cities[current][1],cities[originCity][1],cities[current][2],cities[originCity][2]);
         distance += tempDistance;
         tempRoute[0] = distance;
 
@@ -160,6 +177,7 @@ int main(int argc, char *argv[]){
             }
         }
     }
+
 	end_time = clock();
 	total_time =(float)end_time - (float)start_time;
     /* End Magic */
