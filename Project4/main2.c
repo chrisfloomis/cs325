@@ -37,7 +37,6 @@ int main(int argc, char *argv[]){
 
     /* File Input/Output Variables */
     FILE *output, *input;
-    char* endFile = ".tour";
     char* outputFile;
     char* inputFile = argv[1];
     input = fopen(inputFile, "r");
@@ -48,7 +47,7 @@ int main(int argc, char *argv[]){
     for (i=0; i< len; i++) {
         fileName[i] = inputFile[i];
 	}
-    outputFile = strcat(fileName, endFile);
+    outputFile = strcat(fileName, ".tour");
     output = fopen(outputFile, "w");
 
     /* Determine number of cities from inputFile*/
@@ -76,7 +75,7 @@ int main(int argc, char *argv[]){
         to save time */
     int greedyCount;
     if(lineCount > 2000) {
-        greedyCount = 1;
+        greedyCount = 350;
         largeFile = 1;
     } else {
         greedyCount = lineCount;
