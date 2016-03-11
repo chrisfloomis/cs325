@@ -22,7 +22,6 @@ int** buildArrays(FILE* input, int* lineCount) {
         fscanf(input, "%d", &array[2]);
         // Strip newline
         fscanf(input, "%c", &str1);
-
         biggerArray[i] = array;
         i++;
     }
@@ -123,14 +122,6 @@ int main(int argc, char *argv[]){
 
     for(i = 0; i < greedyCount; i++) {
         distance = 0;
-
-       // Initialize visited array to 0
-        for(j = 0; j < lineCount; j++) {
-            visited[j] = 0;
-            if (j == i) {
-                visited[j] = 1;
-            }
-        }
         // First city is current city
         originCity = i;
         if(largeFile) {
@@ -138,6 +129,14 @@ int main(int argc, char *argv[]){
             originCity = (rand()% lineCount + 1);
         }
         current = originCity;
+
+       // Initialize visited array to 0
+        for(j = 0; j < lineCount; j++) {
+            visited[j] = 0;
+            if (j == current) {
+                visited[j] = 1;
+            }
+        }
 
         // First city in route is current city
         tempRoute[1] = current;
@@ -187,8 +186,7 @@ int main(int argc, char *argv[]){
     }
 
 	printf("Time: %f\n", total_time);
-
-    destroy(cities, lineCount);
+    //destroy(cities, lineCount);
 	close(output);
     close(input);
     return 0;
