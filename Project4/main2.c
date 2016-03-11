@@ -5,65 +5,29 @@
 #include <time.h>
 #include <math.h>
 
-int** buildArrays(FILE* input, int* lineCount) {
-    char str1;
-    // Look into a way to not have to hard-code this?
-    int** biggerArray = (int**)malloc(sizeof(int) * 20000);
-    int i = 0;
-    while(!feof(input)) {
-
-        // Extract Array
-        int* array = malloc(sizeof(int) * 3);
-        // Extract City Identifier
-        fscanf(input, "%d", &array[0]);
-        // Extract x-coordinate
-        fscanf(input, "%d", &array[1]);
-        // Extract y-coordinate
-        fscanf(input, "%d", &array[2]);
-        // Strip newline
-        fscanf(input, "%c", &str1);
-        biggerArray[i] = array;
-        i++;
-    }
-
-    *lineCount = i - 1;
-    return biggerArray;
-}
 
 int pythag(int x1, int x2, int y1, int y2){
 	return round(sqrt(pow((x1-x2),2) + pow((y1-y2),2)));
 }
 
-//takes the biggerArray of the cities and the number of them
-//creates and returns a cost matrix of each city to each other city
-//costMatrix[0][1] will hold the distance from the first city read in from input to the second read from input
-int** buildCostMatrix(int** cities, int lineCount){
-	int i,j;
-	int** costMatrix = (int**)malloc(sizeof(int) * 20000);	//copy/paste from buildArrays()
-	//for each city
-	for(i = 0; i < lineCount; i++){
-        // allocate space for row
-        int* row = malloc(sizeof(int) * lineCount);
-		//call pythag from current city to each other city
-		for(j = 0; j < lineCount; j++){
-			if(i == j)
-				row[j] = INT_MAX;
-			else
-				row[j] = pythag(cities[i][1],cities[j][1],cities[i][2],cities[j][2]);
-		}
-        costMatrix[i] = row;
-	}
-	return costMatrix;
+/* Returns the number of cities in given inputFile */
+int lineCounter(char* inputFile) {
+    FILE *input;
+    char str1;
+    int holder, lineCount, i = 0;
+    input = fopen(inputFile, "r");
+    while(!feof(input)) {
+        fscanf(input, "%d", &holder);
+        fscanf(input, "%d", &holder);
+        fscanf(input, "%d", &holder);
+        fscanf(input, "%c", &str1);
+        i++;
+    }
+    lineCount = i - 1;
+    close(input);
+    return lineCount;
 }
 
-/* Deallocates reserved memory */
-void destroy(int** cities, int line_count) {
-    int i;
-    for(i = 0; i < line_count; i++) {
-        free(cities[i]);
-    }
-    free(cities);
-}
 
 int main(int argc, char *argv[]){
     int i, j, k;
@@ -87,27 +51,40 @@ int main(int argc, char *argv[]){
     outputFile = strcat(fileName, endFile);
     output = fopen(outputFile, "w");
 
-    /* Copy Cities */
-    int** cities;
-    int lineCount;
-    cities = buildArrays(input, &lineCount);
+    /* Determine number of cities from inputFile*/
+    int lineCount = lineCounter(inputFile);
 
-    // Determine the number of times to loop in the greedy loop
+    /* Extract city information and save to array */
+    int cities[lineCount][3];
+    input = fopen(inputFile, "r");
+    i = 0;
+    char str1;
+    while(!feof(input)) {
+        // Extract City Identifier
+        fscanf(input, "%d", &cities[i][0]);
+        // Extract x-coordinate
+        fscanf(input, "%d", &cities[i][1]);
+        // Extract y-coordinate
+        fscanf(input, "%d", &cities[i][2]);
+        // Strip newline
+        fscanf(input, "%c", &str1);
+        i++;
+    }
+
+    /* Determine the number of times to loop in the greedy loop
+        Behavior of program changes if given an extremely large input
+        to save time */
     int greedyCount;
     if(lineCount > 2000) {
-        greedyCount = 350;
+        greedyCount = 1;
         largeFile = 1;
     } else {
         greedyCount = lineCount;
     }
 
-    /* Create Cost Matrix */
-    //int** costM;
-    //costM = buildCostMatrix(cities, lineCount);
-
-    // Route variable structure:
-    // 1st element is the total distance of path
-    // Subsequent elements are the actual path traversal
+    /* Route variable structure:
+     1st element is the total distance of path (route[0])
+     Subsequent elements are the actual path traversal (route[1] ... route[lineCount + 1])*/
 
     /* Where the magic happens */
 	int tempRoute [lineCount + 1];                  // Keep track of temporary route
@@ -119,9 +96,9 @@ int main(int argc, char *argv[]){
     // For every city
     minDistance_all = INT_MAX;
 	start_time = clock();
-
     for(i = 0; i < greedyCount; i++) {
         distance = 0;
+
         // First city is current city
         originCity = i;
         if(largeFile) {
@@ -141,14 +118,15 @@ int main(int argc, char *argv[]){
         // First city in route is current city
         tempRoute[1] = current;
 
-        // We have lineCount visits to check and visit
+        // Visit all the cities
         for(k = 1; k < lineCount; k++) {
             minDistance = INT_MAX;
-            // Evaluate each unvisited city as a next candidate
+            // Evaluate each unvisited city as the next candidate city
             for(j = 0; j < lineCount; j++) {
                 if(visited[j] == 0) {
                     // Check distance from current city to candidate city
                     tempDistance = pythag(cities[current][1],cities[j][1],cities[current][2],cities[j][2]);
+                    //tempDistance = costM[current][j];
                     // Keep track of the closest candidate city
                     if(tempDistance < minDistance) {
                         minDistance = tempDistance;
@@ -156,6 +134,7 @@ int main(int argc, char *argv[]){
                     }
                 }
             }
+
             // Save and move to best candidate city
             visited[candidateCity] = 1;
             tempRoute[k + 1] = candidateCity;
@@ -181,12 +160,15 @@ int main(int argc, char *argv[]){
 	total_time =(float)end_time - (float)start_time;
     /* End Magic */
 
+    /* Write best route to .tour file */
     for(i = 0; i < lineCount + 1; i++) {
         fprintf(output, "%d\n", minRoute[i]);
     }
 
+    /* Print to Screen General Results and Time */
 	printf("Time: %f\n", total_time);
-    //destroy(cities, lineCount);
+	printf("Tour Length: %d\n", minRoute[0]);
+
 	close(output);
     close(input);
     return 0;
