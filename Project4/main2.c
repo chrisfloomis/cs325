@@ -1,10 +1,18 @@
+/* Project 3 - Traveling Salesman Problem
+    Group 9:
+    Christopher Loomis
+    Benjamin Tullis
+    Dalena Pham
+
+    Program attempts to find a route with the lowest cost given a graph of cities using
+    nearest neighbor heuristic.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <string.h> /* memset */
+#include <string.h>
 #include <time.h>
 #include <math.h>
-
 
 int pythag(int x1, int x2, int y1, int y2){
 	return round(sqrt(pow((x1-x2),2) + pow((y1-y2),2)));
@@ -28,7 +36,6 @@ int lineCounter(char* inputFile) {
     return lineCount;
 }
 
-
 int main(int argc, char *argv[]){
     int i, j, k;
     int largeFile = 0;              // Program will change behavior depending on number of cities given
@@ -39,12 +46,12 @@ int main(int argc, char *argv[]){
     FILE *output, *input;
     char* outputFile;
     char* inputFile = argv[1];
-    input = fopen(inputFile, "r");
 
     /* Creating .tour output file */
     int len = strlen(inputFile);
-    char fileName[len];
-    for (i=0; i< len; i++) {
+    char fileName[len + 5];
+    memset(fileName, 0, sizeof(fileName));
+    for (i=0; i < len; i++) {
         fileName[i] = inputFile[i];
 	}
     outputFile = strcat(fileName, ".tour");
@@ -125,7 +132,6 @@ int main(int argc, char *argv[]){
                 if(visited[j] == 0) {
                     // Check distance from current city to candidate city
                     tempDistance = pythag(cities[current][1],cities[j][1],cities[current][2],cities[j][2]);
-                    //tempDistance = costM[current][j];
                     // Keep track of the closest candidate city
                     if(tempDistance < minDistance) {
                         minDistance = tempDistance;
